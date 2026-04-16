@@ -1,0 +1,18 @@
+{
+  "model": "openai",
+  "mode": "baseline",
+  "total": 20,
+  "correct": 5,
+  "ex_accuracy": 0.25,
+  "by_difficulty": {
+    "simple": 0.2941,
+    "moderate": 0.0
+  },
+  "error_counts": {
+    "wrong_column": 8,
+    "syntax_error": 3,
+    "correct": 5,
+    "wrong_condition": 2,
+    "wrong_join": 2
+  }
+}

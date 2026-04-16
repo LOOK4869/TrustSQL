@@ -1,0 +1,18 @@
+# 数据库文件（体积过大，不提交）
+data/dev_databases/
+*.sqlite
+
+# API 密钥（绝对不能提交）
+.env
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# 实验结果（可选，按需提交）
+# results_*.json

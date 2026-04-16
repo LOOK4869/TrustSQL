@@ -12,12 +12,13 @@ GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
 # --- Model Names ---
 OPENAI_MODEL: str = "gpt-4o-mini"
-GEMINI_MODEL: str = "gemini-1.5-flash"
-GROQ_MODEL: str = "llama3-8b-8192"
+GEMINI_MODEL: str = "gemini-2.0-flash"
+GROQ_MODEL: str = "llama-3.1-8b-instant"
 
 # --- Dataset Paths ---
-BIRD_DATA_DIR: str = os.path.join("data", "bird")
+BIRD_DATA_DIR: str = "data"
 BIRD_DEV_JSON: str = os.path.join(BIRD_DATA_DIR, "dev.json")
+BIRD_TABLES_JSON: str = os.path.join(BIRD_DATA_DIR, "dev_tables.json")
 BIRD_DB_DIR: str = os.path.join(BIRD_DATA_DIR, "dev_databases")
 
 # --- Pipeline Settings ---

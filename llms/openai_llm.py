@@ -14,21 +14,19 @@ class OpenAILLM(BaseLLM):
         temperature: float = TEMPERATURE,
         max_tokens: int = MAX_TOKENS,
     ) -> None:
-        """
-        Initialize the OpenAI client.
-
-        Args:
-            model: OpenAI model identifier.
-            temperature: Sampling temperature.
-            max_tokens: Max tokens to generate.
-        """
         super().__init__(model, temperature, max_tokens)
         self.client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
     def complete(self, prompt: str) -> str:
         """Send a single-turn prompt and return the completion text."""
-        pass
+        return self.chat([{"role": "user", "content": prompt}])
 
     def chat(self, messages: list[dict[str, str]]) -> str:
         """Send a chat message list and return the assistant's response text."""
-        pass
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=self.temperature,
+            max_tokens=self.max_tokens,
+        )
+        return response.choices[0].message.content.strip()
