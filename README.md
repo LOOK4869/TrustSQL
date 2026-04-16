@@ -92,8 +92,26 @@ trustsql/
 
 This project uses the **BIRD** (Big Bench for Large-scale Database Grounded Text-to-SQL) benchmark.
 
-- Download from: https://bird-bench.github.io/
-- Place the data under `data/bird/` (see `config.py` for expected paths)
+> ⚠️ **The dataset is NOT included in this repository** (files are too large for GitHub).
+> You must download it manually before running any code.
+
+**Download steps:**
+1. Go to https://bird-bench.github.io/
+2. Click the **Dev Set** button to download the dataset
+3. Unzip and place the contents directly under `data/` so the structure looks like:
+
+```
+data/
+├── dev.json
+├── dev_tables.json
+├── dev_databases/
+│   ├── california_schools/
+│   │   └── california_schools.sqlite
+│   ├── card_games/
+│   │   └── card_games.sqlite
+│   └── ... (11 databases total)
+└── loader.py
+```
 
 ---
 
@@ -105,7 +123,11 @@ This project uses the **BIRD** (Big Bench for Large-scale Database Grounded Text
 pip install -r requirements.txt
 ```
 
-### 2. Configure API keys
+### 2. Download the BIRD dataset
+
+See the **Dataset** section above. Make sure `data/dev.json` and `data/dev_databases/` exist before proceeding.
+
+### 3. Configure API keys
 
 Copy `.env.example` to `.env` and fill in your keys:
 
@@ -119,23 +141,46 @@ GOOGLE_API_KEY=...
 GROQ_API_KEY=gsk_...
 ```
 
-### 3. Run a single query through the full pipeline
+At minimum, you need either `OPENAI_API_KEY` (GPT-4o-mini) or `GROQ_API_KEY` (Llama 3.1, free) to run the pipeline.
+
+### 4. Verify the dataset loads correctly
 
 ```bash
-python main.py --question "How many singers are from France?" --db_id "concert_singer"
+python -c "
+from data.loader import BirdLoader
+loader = BirdLoader()
+examples = loader.load()
+print(f'Loaded {len(examples)} examples across {len(set(e.db_id for e in examples))} databases')
+"
 ```
 
-### 4. Run experiments
+Expected output: `Loaded 1534 examples across 11 databases`
+
+### 5. Run interactive demo
 
 ```bash
-# Baseline (no reliability mechanisms)
-python experiments/run_baseline.py
+python main.py
+```
 
-# Full pipeline
-python experiments/run_full_pipeline.py
+Select a database from the menu, then type any natural language question. The pipeline will run through all 5 steps and return the answer.
 
-# LLM comparison
-python experiments/run_llm_comparison.py
+### 6. Run a single query (non-interactive)
+
+```bash
+python main.py --question "How many superheroes have blue eyes?" --db_id "superhero" --verbose
+```
+
+### 7. Run experiments
+
+```bash
+# Baseline (direct prompting, no reliability mechanisms)
+python -m experiments.run_baseline --model openai --limit 100
+
+# Full pipeline (all three mechanisms)
+python -m experiments.run_full_pipeline --model openai --limit 100
+
+# Cross-LLM comparison (GPT-4o-mini vs Llama 3.1)
+python -m experiments.run_llm_comparison --limit 100
 ```
 
 ---
@@ -262,7 +307,7 @@ trustsql/
 本项目使用 **BIRD**（面向大规模数据库的 Text-to-SQL 大型基准）数据集。
 
 - 下载地址：https://bird-bench.github.io/
-- 将数据放置于 `data/bird/` 目录下（路径配置见 `config.py`）
+- 将数据直接放置于 `data/` 目录下（注意：不是 `data/bird/`，路径配置见 `config.py`）
 
 ---
 
