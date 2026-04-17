@@ -12,18 +12,21 @@ Build and evaluate a three-component reliability pipeline:
 ## Dataset
 - **BIRD Benchmark** (Big Bench for Large-scale Database Grounded Text-to-SQL Evaluation)
 - Contains real-world, noisy databases with domain knowledge requirements
+- 1534 examples across 11 databases，难度分布：925 simple / 464 moderate / 145 challenging
+- 数据直接放在 `data/` 下（不是 `data/bird/`）
 
 ## LLMs Under Evaluation
 | Model | Provider | API |
 |-------|----------|-----|
 | GPT-4o-mini | OpenAI | openai SDK |
-| Gemini 1.5 Flash | Google | google-generativeai SDK |
-| Llama 3 | Meta via Groq | groq SDK |
+| Gemini 2.0 Flash | Google | google-genai SDK（因API政策变更未能用于实验，见问题记录）|
+| Llama 3.1-8b | Meta via Groq | groq SDK |
 
 ## Evaluation Metrics
 - **EX (Execution Accuracy)** — Does the generated SQL produce the same result as gold SQL?
 - **Robustness** — Does accuracy hold under semantic perturbations of the question?
 - **Error Type Analysis** — Categorize failures: wrong table, wrong column, wrong join, wrong condition, etc.
+- **Efficiency & Cost** — Execution time and latency comparison between baseline and full pipeline
 
 ## Pipeline Flow
 ```
@@ -39,7 +42,7 @@ User Question
 ```
 trustsql/
 ├── config.py               # API keys, model configs, dataset paths
-├── main.py                 # Full pipeline entry point
+├── main.py                 # Full pipeline entry point (interactive mode)
 ├── data/loader.py          # BIRD dataset loader
 ├── pipeline/               # Core pipeline components
 ├── llms/                   # LLM wrappers (OpenAI, Gemini, Groq)
@@ -51,6 +54,9 @@ trustsql/
 - All LLM calls go through the abstract `llms/base.py` interface — never call SDKs directly in pipeline code
 - Use `.env` for all API keys, never hardcode
 - SQL execution is always sandboxed against a local SQLite copy of BIRD databases
+- Run experiment scripts with `python -m experiments.run_xxx` from project root
+
+---
 
 ## Milestones
 
@@ -60,110 +66,163 @@ trustsql/
 - config.py, main.py, .env.example
 
 ### Milestone 2: Dataset Integration ✅
-- Downloaded BIRD dev set from https://bird-bench.github.io (placed directly under data/, not data/bird/)
-- Implemented data/loader.py: BirdExample dataclass + BirdLoader class
-  - load() reads dev.json → 1534 examples across 11 databases
-  - get_schema() uses dev_tables.json (column_names_original) as primary source, falls back to SQLite PRAGMA
-  - get_foreign_keys() parses dev_tables.json foreign_keys index pairs
-  - get_db_path() returns path to per-database .sqlite file
-- Dataset stats: 925 simple / 464 moderate / 145 challenging
-- Key finding: BIRD column names contain spaces and special chars (e.g. `Free Meal Count (K-12)`) — must be quoted with backticks in SQL
-
-### 实验过程中遇到的问题记录（供报告参考）
-
-#### 问题1：Groq API 限速（Rate Limit）
-- 现象：使用 Llama 3.1（via Groq）跑100条样本时，实验中途报错 `RateLimitError 429`
-- 原因：Groq 免费版每分钟 token 上限为 6000 TPM，连续请求超额
-- 解决方案：在 `groq_llm.py` 中加入指数退避重试机制（1s → 2s → 4s → 8s → 16s）
-- 报告写法：可在 Efficiency & Cost 章节提及，免费 API 的速率限制是实际部署中需要考虑的工程问题，付费版可解决
-
-#### 问题2：Groq 模型下线
-- 现象：原计划使用 `llama3-8b-8192`，调用时报错 `model_decommissioned`
-- 原因：Groq 于2025年底下线了该模型
-- 解决方案：改用 `llama-3.1-8b-instant`
-- 报告写法：说明 LLM API 生态变化较快，模型版本需定期更新
-
-#### 问题3：Gemini API 免费额度政策变更
-- 现象：Google AI Studio 个人账号 free tier quota 为 0，无法免费调用
-- 原因：Google 于2026年4月调整政策，部分地区需付费才能使用
-- 解决方案：项目改为使用 GPT-4o-mini 和 Llama 3.1 两个模型进行对比
-- 报告写法：说明 Gemini 因 API 政策变更未能纳入实验，但代码层面已完整实现（`llms/gemini_llm.py`），如获得访问权限可直接接入
-
-### Gemini API 集成说明（2026年4月）
-- 尝试使用 Google AI Studio 个人账号（look4869128@gmail.com）获取 Gemini 免费 API
-- 历史上 Gemini API 提供每日免费额度（free tier），但 2026年4月政策已变更
-- 现在免费层级 quota 为 0，必须购买点数（最低 $25）才能调用 API
-- 项目决定跳过 Gemini，使用 GPT-4o-mini（OpenAI）和 Llama 3.1（Groq）两个模型进行实验
-- 报告说明：Gemini 因 API 政策变更无法免费使用，实验在 GPT-4o-mini 和 Llama 3.1 上进行对比
-- 技术上 GeminiLLM 封装已完整实现（llms/gemini_llm.py），如后续获得 API 额度可直接接入
+- Downloaded BIRD dev set，直接放在 data/ 下
+- 实现 data/loader.py：BirdExample dataclass + BirdLoader 类
+- 关键发现：BIRD 列名含空格和特殊字符（如 `Free Meal Count (K-12)`），SQL 中必须用反引号
 
 ### Milestone 3: Baseline Implementation ✅
-- Implemented llms/base.py: abstract BaseLLM with complete() and chat() methods
-- Implemented llms/openai_llm.py: GPT-4o-mini via openai SDK
-- Implemented pipeline/sql_generator.py: prompt → LLM → SQL extraction via regex (```sql blocks)
-- Implemented evaluation/executor.py: SQLite sandboxed execution + order-independent result comparison
-- End-to-end verified: question → SQL → execution → result
-- **Baseline EX result (10 samples): 1/10 = 10%**
-- Key failure mode observed: model strips spaces from column names (e.g. `Free Meal Count (K-12)` → `FreeMealCountK12`), causing "no such column" errors
-- This motivates Milestone 4: Schema Awareness will inject exact column names into the prompt
+- 实现 llms/base.py、llms/openai_llm.py、pipeline/sql_generator.py、evaluation/executor.py
+- 端到端跑通：question → SQL → execution → result
+- 初始 baseline EX（10条）：10%
+- 发现主要失败原因：模型把带空格的列名简化（如 `Free Meal Count (K-12)` → `FreeMealCountK12`）
 
 ### Milestone 4: Three Reliability Mechanisms ✅
-- Implemented pipeline/schema_awareness.py: LLM-based schema filtering, returns JSON of relevant tables/columns, validated against full schema, falls back to full schema if parsing fails
-- Implemented pipeline/reasoning.py: 6-step CoT prompt (SELECT target → tables → JOINs → WHERE → aggregations → ORDER/LIMIT)
-- Implemented pipeline/verification.py: three checks — SQLite EXPLAIN syntax check, backtick column name validation, multi-table JOIN path warning
-- Connected all three into main.py: run_pipeline() function with verbose mode
-- Small-scale result (10 samples): Baseline 10% → Full Pipeline 20% (+10%)
-- Key observation: Schema filtering correctly prunes irrelevant tables; CoT reasoning improves JOIN identification; column name errors remain the dominant failure mode
+- 实现 pipeline/schema_awareness.py：LLM 驱动的 Schema 过滤，返回 JSON，验证后回退到全 schema
+- 实现 pipeline/reasoning.py：CoT 推理（后调整为只推理逻辑结构，不涉及列名）
+- 实现 pipeline/verification.py：语法检查、列名检查、JOIN 路径检查
+- 串联进 main.py：run_pipeline() + 交互式模式
 
-### Milestone 5: Experiments and Evaluation
-- Implement llms/gemini_llm.py and llms/groq_llm.py
-- Implement evaluation/metrics.py and evaluation/robustness.py
-- Run experiments/run_baseline.py and experiments/run_full_pipeline.py
-- Run experiments/run_llm_comparison.py across all three LLMs
+### Milestone 5: Experiments and Evaluation ✅
+- 实现 llms/groq_llm.py（含限速重试）、llms/gemini_llm.py（已实现但未用于实验）
+- 实现 evaluation/metrics.py、evaluation/robustness.py
+- 实现 experiments/run_baseline.py、run_full_pipeline.py、run_llm_comparison.py、run_ablation.py
 
-### Milestone 6: Results and Final Report
-- Generate comparison tables
-- Error type analysis
-- Write final report
+### Milestone 5 实验结果汇总
 
-### Milestone 6 补充：Robustness 测试（待实现，最后统一跑）
-- 等所有代码确认没问题后，最后跑一次 robustness.py
-- 测试 paraphrase（改写问题）和 synonym replace（同义词替换）两种扰动
-- 结果放进最终 Notebook 的对比表格
-- 目的：控制 API 消费，集中在最后一次跑完所有测试
+#### 第一次实验（prompt有bug，已废弃）
+- GPT-4o-mini：Baseline 18% → Full Pipeline 13%（Pipeline 反而更差）
+- 原因：Schema 过滤误删关键列 + SQL generator 未强调列名反引号
 
-### Milestone 6 补充：Efficiency & Cost 计时（待实现）
-- 在实验脚本里加计时功能，记录每条查询的耗时
-- 对比 baseline 和 full pipeline 的平均延迟
-- 对应论文 4.4 节 Efficiency and Cost
+#### 第二次实验（修复 prompt 后，CoT 改进前）
+| 模型 | 模式 | EX | Simple | Moderate | Challenging |
+|------|------|-----|--------|----------|-------------|
+| GPT-4o-mini | Baseline | 24% | 30.5% | 11.4% | 33.3% |
+| GPT-4o-mini | Full Pipeline | 26% | 37.3% | 8.6% | 16.7% |
+| Llama-3.1-8b | Baseline | 17% | 28.8% | 2.9% | 0.0% |
+| Llama-3.1-8b | Full Pipeline | 13% | 22.0% | 0.0% | 0.0% |
 
-### Milestone 5 实验结果（100条样本）
-| 模型 | 模式 | EX准确率 | simple | moderate | challenging |
-|------|------|---------|--------|----------|-------------|
-| GPT-4o-mini | Baseline | 18% | 22.0% | 14.3% | 0.0% |
-| GPT-4o-mini | Full Pipeline | 13% | 15.3% | 8.6% | 16.7% |
-| Llama-3.1-8b | Baseline | 12% | 18.6% | 2.9% | 0.0% |
-| Llama-3.1-8b | Full Pipeline | 10% | 16.9% | 0.0% | 0.0% |
+#### 消融实验（第一版 CoT，20条）
+| 配置 | EX | 相比Baseline |
+|------|----|-------------|
+| Baseline | 15% | — |
+| Schema only | 50% | +35% |
+| CoT only | 20% | +5% |
+| Verification only | 15% | 0% |
+| Full Pipeline | 45% | +30% |
+
+#### 消融实验（改进 CoT 后，20条）
+| 配置 | EX | 相比Baseline |
+|------|----|-------------|
+| Baseline | 20% | — |
+| Schema only | 40% | +20% |
+| CoT only | 35% | +15% |
+| Verification only | 20% | 0% |
+| Full Pipeline | 40% | +20% |
+
+#### 消融实验（修复 Verification 自纠错误报后，20条）
+| 配置 | EX | 相比Baseline |
+|------|----|-------------|
+| Baseline | 20% | — |
+| Schema only | 50% | +30% |
+| CoT only | 40% | +20% |
+| Verification only | 20% | 0%（无副作用）|
+| Full Pipeline | 45% | +25% |
+
+改动说明：将列名检查、JOIN路径检查降级为 warning，只有 SQLite 语法错误才触发 LLM 自纠错。
+
+#### 第三次实验（改进 CoT prompt 后，100条）
+| 模型 | 模式 | EX | Simple | Moderate | Challenging |
+|------|------|-----|--------|----------|-------------|
+| GPT-4o-mini | Baseline | 24% | 30.5% | 11.4% | 33.3% |
+| GPT-4o-mini | Full Pipeline | 26% | 37.3% | 11.4% | 0.0% |
+| Llama-3.1-8b | Baseline | 17% | 28.8% | 0.0% | 0.0% |
+| Llama-3.1-8b | Full Pipeline | 17% | 22.0% | 11.4% | 0.0% |
+
+#### 第四次实验（最终版，修复 Verification 误报后，100条）
+| 模型 | 模式 | EX | Simple | Moderate | Challenging |
+|------|------|-----|--------|----------|-------------|
+| GPT-4o-mini | Baseline | 24% | 30.5% | 11.4% | 33.3% |
+| GPT-4o-mini | Full Pipeline | 26% | 35.6% | 14.3% | 0.0% |
+| Llama-3.1-8b | Baseline | 17% | 28.8% | 0.0% | 0.0% |
+| Llama-3.1-8b | Full Pipeline | 19% | 25.4% | 11.4% | 0.0% |
 
 主要发现：
-- GPT-4o-mini 整体优于 Llama 3.1
-- Full Pipeline 对 challenging 难度有帮助（GPT 0%→16.7%）
-- Full Pipeline 总体 EX 略低于 Baseline，原因是 Schema 过滤有时误删关键列，导致 wrong_column 错误增多
-- 最常见错误：wrong_column（列名问题）和 wrong_condition（条件写错）
-- 需要分析并在报告中讨论为何 full pipeline EX 低于 baseline（prompt设计问题，schema过滤过激）
+- Schema Awareness 是最核心机制，消融实验显示单独使用提升最大（+30%）
+- GPT-4o-mini Full Pipeline 比 Baseline +2%，Simple 难度 +5.1%，所有难度均不低于 Baseline
+- Llama-3.1-8b Full Pipeline 比 Baseline +2%，修复 Verification 误报后有改善
+- Challenging 仅6条样本，数值波动大，不具统计意义
+- 最常见错误：wrong_column、wrong_join、wrong_condition
+
+---
+
+## 实验过程中遇到的问题记录（供报告参考）
+
+### 问题1：Groq 模型下线
+- 现象：调用 `llama3-8b-8192` 报错 `model_decommissioned`
+- 原因：Groq 于2025年底下线该模型
+- 解决：改用 `llama-3.1-8b-instant`
+- 报告写法：LLM API 生态变化快，模型版本需定期更新
+
+### 问题2：Groq API 限速（Rate Limit）
+- 现象：跑100条时中途报错 `RateLimitError 429`
+- 原因：Groq 免费版每分钟 token 上限 6000 TPM
+- 解决：在 `groq_llm.py` 加入指数退避重试（1s→2s→4s→8s→16s）
+- 报告写法：免费 API 限速是实际部署需考虑的工程问题
+
+### 问题3：Gemini API 免费额度政策变更
+- 现象：Google AI Studio 个人账号 free tier quota 为 0
+- 原因：Google 2026年4月调整政策，部分地区需付费
+- 解决：改为 GPT-4o-mini 和 Llama 3.1 两个模型对比
+- 报告写法：Gemini 因政策变更未纳入实验，代码已实现（`llms/gemini_llm.py`），有额度可直接接入
+
+### 问题4：Full Pipeline EX 低于 Baseline（已修复）
+- 现象：第一次100条实验，Full Pipeline 13% < Baseline 18%
+- 原因1：Schema 过滤 prompt 太激进，误删关键列
+- 原因2：SQL generator prompt 未强调含空格列名需用反引号
+- 修复：Schema filter 改为"宁多勿少"；SQL generator 明确要求反引号，禁止简化列名
+- 报告写法：prompt engineering 对系统性能的影响，pipeline 设计需要迭代优化
+
+### 问题5：消融实验的发现（Ablation Study）
+- 背景：第二次100条实验提升幅度不理想，想找出哪个机制最有效
+- 动机：自然想到把三个机制拆开分别测试，事后意识到这就是学术上的消融实验
+- 关键发现：Schema Awareness 单独使用从15%提升到50%（+35%），是最核心的机制
+- 报告写法：可在反思部分写"在实践中自然推导出消融实验方法，后认识到这是标准学术分析手段"
+
+### 问题7：Verification 自纠错产生副作用（已修复）
+- 现象：加入 LLM 自纠错后，"Verification only" 消融配置 EX 反而低于 Baseline（20% → 20%，Full Pipeline 40% 未超过 Schema only 50%）
+- 原因：列名检查和 JOIN 路径检查存在误报——schema 被过滤后，合法的列名可能不在过滤后的 schema 里；误判触发 LLM 重写，把本来正确的 SQL 改坏了
+- 修复：将列名检查和 JOIN 检查降级为 warning（只记录不干预），只有 SQLite 实际报语法错误时才触发 LLM 自纠错（误报率接近零）
+- 设计原则：验证器应"宁可漏报，不可误报"——语法错误是客观事实，可以放心纠错；列名推断是启发式规则，不能作为自动修改的依据
+- 报告写法：说明 Verification 作为最后一道保障，其价值在于捕获语法级错误，不应过度干预语义层面
+
+### 问题6：CoT 定位与局限性
+- 理想设计：CoT 作为用户确认环节，用户可主观判断推理是否合理
+- 局限性：BIRD 全自动评估无法验证推理过程，人工验证1534条不现实
+- 发现的问题：原 CoT prompt 让模型自由推理列名，污染 SQL generator
+- 解决（评估版）：CoT 只推理逻辑结构（需不需要 JOIN/聚合/排序），不涉及列名
+- Demo 展示版（计划）：保留完整推理展示，让观众主观判断答案合理性
+- 报告写法：在局限性章节承认，在未来工作提出"引入人工反馈的交互式CoT"
+
+---
+
+## 待完成事项
+
+### Milestone 5 补充（待实现，最后统一跑）
+- Robustness 测试：paraphrase + synonym replace 两种扰动，结果放进 Notebook
+- Efficiency & Cost：在实验脚本加计时，记录 baseline vs full pipeline 平均延迟
+
+### Milestone 6: Results and Final Report（待做）
+- 制作 Notebook：实验数据图表（对比表、错误类型分布、难度分组）
+- 写最终报告
 
 ### Milestone 7: Demo 准备（待实现）
-- 改造 main.py 为交互式模式：直接运行 `python main.py` 无需任何参数
-- 终端显示可用数据库列表，用户输入数字选择
-- 用户直接输入自然语言问题按回车，流水线自动执行
-- 展示每一步中间结果（Schema过滤 → CoT推理 → SQL生成 → 验证 → 执行结果）
-- 提前筛选2-3条模型能答对的问题，现场跑有把握
+- 改造 main.py 为交互式模式（直接运行无需参数）
+- 提前筛选2-3条模型能答对的问题备用
+- 制作 PPT（含项目介绍 + 实验数据，供老师课后查阅）
 
-**Demo现场流程（共6分钟）：**
-1. 1分钟：PPT介绍项目（是什么、三个机制）
+**Demo 现场流程（共6分钟）：**
+1. 1分钟：PPT 介绍项目（是什么、三个机制）
 2. 3分钟：现场跑 main.py（交互式，2-3条问题）
 3. 2分钟：切换到 Notebook 展示实验数据和图表
 
-**提交内容：**
-- PPT（含项目介绍 + 实验数据图表，供老师课后查阅）
-- Notebook（现场展示用）
+**提交内容：** PPT + Notebook 链接

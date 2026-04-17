@@ -62,12 +62,15 @@ def run_pipeline(question: str, db_id: str, llm, evidence: str = "", verbose: bo
         print(sql)
         print()
 
-    # Step 4: Verification
-    verifier = SQLVerifier(db_path)
+    # Step 4: Verification + Self-correction
+    verifier = SQLVerifier(db_path, llm=llm)
     verification = verifier.verify(sql, filtered_schema)
+    sql = verifier.get_final_sql(sql, verification)
     if verbose:
         print("=== Step 4: Verification ===")
         print(verification)
+        if verification.corrected_sql:
+            print(f"  Self-corrected SQL:\n  {verification.corrected_sql}")
         print()
 
     # Step 5: Execution

@@ -25,16 +25,13 @@ class ChainOfThoughtReasoner:
         return self.llm.complete(prompt)
 
     def _build_prompt(self, question: str, schema: dict[str, list[str]], evidence: str = "") -> str:
-        """Build the CoT reasoning prompt."""
-        schema_lines = []
-        for table, cols in schema.items():
-            schema_lines.append(f"  {table}({', '.join(cols)})")
-        schema_str = "\n".join(schema_lines)
+        """Build the CoT reasoning prompt — focuses on logical structure only, not column names."""
+        table_names = list(schema.keys())
 
-        prompt = f"""You are a SQL reasoning assistant. Before writing SQL, think step by step about how to answer the question using the database schema.
+        prompt = f"""You are a SQL query planner. Your job is to reason about the LOGICAL STRUCTURE of a SQL query — not to write SQL or name specific columns.
 
-## Database Schema
-{schema_str}
+## Available Tables
+{', '.join(table_names)}
 """
         if evidence:
             prompt += f"\n## Evidence\n{evidence}\n"
@@ -44,16 +41,17 @@ class ChainOfThoughtReasoner:
 {question}
 
 ## Instructions
-Think through the following steps:
-1. What information is being asked for? (SELECT target)
-2. Which table(s) contain that information?
-3. Are any JOINs needed? If so, on which keys?
-4. Are there any WHERE conditions or filters?
-5. Are aggregations (COUNT, SUM, AVG, MAX, MIN) or GROUP BY needed?
-6. Is any ORDER BY or LIMIT needed?
+Think through the following structural questions only. Do NOT mention specific column names — the SQL generator will handle that.
 
-Be concise. Use exact column names from the schema.
+1. What type of result is needed? (a single value, a list, a count, etc.)
+2. Which table(s) are likely involved?
+3. Is a JOIN between tables needed? (yes/no, and why)
+4. Is there a filtering condition? (yes/no, and what kind — equality, range, string match, etc.)
+5. Is aggregation needed? (yes/no — COUNT, SUM, AVG, MAX, MIN)
+6. Is sorting or row-limiting needed? (yes/no — ORDER BY, LIMIT)
 
-## Step-by-step Reasoning
+Be concise. Answer each point in one sentence. Do not write any SQL.
+
+## Logical Reasoning
 """
         return prompt

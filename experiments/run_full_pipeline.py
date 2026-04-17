@@ -39,9 +39,10 @@ def run_full_pipeline(llm, examples, loader, limit: int | None = None) -> list[E
         # Step 3: SQL generation
         pred_sql = generator.generate(ex.question, filtered_schema, ex.evidence, reasoning)
 
-        # Step 4: Verification (log but don't block)
-        verifier = SQLVerifier(db_path)
-        verifier.verify(pred_sql, filtered_schema)
+        # Step 4: Verification + Self-correction
+        verifier = SQLVerifier(db_path, llm=llm)
+        verification = verifier.verify(pred_sql, filtered_schema)
+        pred_sql = verifier.get_final_sql(pred_sql, verification)
 
         # Step 5: Evaluate
         exec_result = executor.execute(pred_sql)

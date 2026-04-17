@@ -1,0 +1,79 @@
+[
+  {
+    "label": "Baseline (no mechanisms)",
+    "use_schema": false,
+    "use_cot": false,
+    "use_verify": false,
+    "correct": 4,
+    "total": 20,
+    "ex_accuracy": 0.2,
+    "error_counts": {
+      "wrong_column": 10,
+      "correct": 4,
+      "wrong_condition": 4,
+      "wrong_table": 2
+    }
+  },
+  {
+    "label": "Schema only",
+    "use_schema": true,
+    "use_cot": false,
+    "use_verify": false,
+    "correct": 10,
+    "total": 20,
+    "ex_accuracy": 0.5,
+    "error_counts": {
+      "correct": 10,
+      "wrong_column": 4,
+      "wrong_condition": 4,
+      "wrong_table": 1,
+      "wrong_join": 1
+    }
+  },
+  {
+    "label": "CoT only",
+    "use_schema": false,
+    "use_cot": true,
+    "use_verify": false,
+    "correct": 8,
+    "total": 20,
+    "ex_accuracy": 0.4,
+    "error_counts": {
+      "correct": 8,
+      "wrong_column": 9,
+      "wrong_condition": 2,
+      "other": 1
+    }
+  },
+  {
+    "label": "Verification only",
+    "use_schema": false,
+    "use_cot": false,
+    "use_verify": true,
+    "correct": 4,
+    "total": 20,
+    "ex_accuracy": 0.2,
+    "error_counts": {
+      "wrong_column": 7,
+      "wrong_table": 5,
+      "correct": 4,
+      "wrong_condition": 4
+    }
+  },
+  {
+    "label": "Full Pipeline (all three)",
+    "use_schema": true,
+    "use_cot": true,
+    "use_verify": true,
+    "correct": 9,
+    "total": 20,
+    "ex_accuracy": 0.45,
+    "error_counts": {
+      "correct": 9,
+      "wrong_join": 3,
+      "wrong_column": 4,
+      "wrong_condition": 3,
+      "other": 1
+    }
+  }
+]

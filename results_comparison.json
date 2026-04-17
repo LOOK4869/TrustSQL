@@ -6,18 +6,19 @@
     "correct": 24,
     "ex_accuracy": 0.24,
     "by_difficulty": {
-      "simple": 0.3051,
-      "moderate": 0.1143,
+      "simple": 0.2881,
+      "moderate": 0.1429,
       "challenging": 0.3333
     },
     "error_counts": {
-      "wrong_column": 46,
+      "wrong_column": 47,
       "correct": 24,
       "wrong_condition": 12,
       "wrong_table": 7,
-      "wrong_join": 7,
+      "wrong_join": 6,
       "syntax_error": 2,
-      "other": 2
+      "other": 1,
+      "execution_error": 1
     }
   },
   "gpt-4o-mini_full_pipeline": {
@@ -28,16 +29,15 @@
     "ex_accuracy": 0.26,
     "by_difficulty": {
       "simple": 0.3729,
-      "moderate": 0.0857,
-      "challenging": 0.1667
+      "moderate": 0.1143,
+      "challenging": 0.0
     },
     "error_counts": {
       "correct": 26,
-      "wrong_column": 20,
-      "wrong_join": 17,
-      "syntax_error": 1,
-      "wrong_condition": 27,
-      "other": 6,
+      "wrong_join": 16,
+      "wrong_column": 26,
+      "wrong_condition": 25,
+      "other": 4,
       "wrong_table": 3
     }
   },
@@ -67,22 +67,20 @@
     "model": "llama-3.1-8b",
     "mode": "full_pipeline",
     "total": 100,
-    "correct": 13,
-    "ex_accuracy": 0.13,
+    "correct": 17,
+    "ex_accuracy": 0.17,
     "by_difficulty": {
       "simple": 0.2203,
-      "moderate": 0.0,
+      "moderate": 0.1143,
       "challenging": 0.0
     },
     "error_counts": {
-      "correct": 13,
-      "wrong_column": 39,
-      "execution_error": 2,
-      "wrong_join": 12,
-      "wrong_condition": 26,
-      "other": 3,
+      "wrong_join": 28,
+      "wrong_column": 36,
+      "correct": 17,
+      "wrong_condition": 11,
       "syntax_error": 2,
-      "wrong_table": 3
+      "execution_error": 6
     }
   }
 }
