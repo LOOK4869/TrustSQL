@@ -215,10 +215,30 @@ trustsql/
 - 制作 Notebook：实验数据图表（对比表、错误类型分布、难度分组）
 - 写最终报告
 
-### Milestone 7: Demo 准备（待实现）
-- 改造 main.py 为交互式模式（直接运行无需参数）
-- 提前筛选2-3条模型能答对的问题备用
+### Milestone 7: Demo 准备
+- 改造 main.py 为交互式模式 ✅（直接运行无需参数，显示数据库列表，循环输入）
+- 提前筛选2-3条模型能答对的问题备用 ✅（见下方）
 - 制作 PPT（含项目介绍 + 实验数据，供老师课后查阅）
+
+#### Demo 备用问题（Full Pipeline 已验证答对，数据库均为 california_schools）
+
+**问题1（推荐首选，结果直观）**
+- Question: `What is the phone number of the school that has the highest average score in Math?`
+- Evidence: （留空，直接回车）
+- Database: `california_schools`
+- 预期结果: `(408) 366-7700`
+
+**问题2（有趣，涉及计算）**
+- Question: `What is the type of education offered in the school who scored the highest average in Math?`
+- Evidence: （留空）
+- Database: `california_schools`
+- 预期结果: `Traditional`
+
+**问题3（涉及 Evidence，能展示 domain knowledge 机制）**
+- Question: `How many schools with an average score in Math greater than 400 in the SAT test are exclusively virtual?`
+- Evidence: `Exclusively virtual refers to Virtual = 'F'`
+- Database: `california_schools`
+- 预期结果: `4`
 
 **Demo 现场流程（共6分钟）：**
 1. 1分钟：PPT 介绍项目（是什么、三个机制）

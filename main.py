@@ -93,27 +93,84 @@ def run_pipeline(question: str, db_id: str, llm, evidence: str = "", verbose: bo
     }
 
 
+def interactive_mode(llm) -> None:
+    """Interactive demo mode: prompt user for question and db_id in a loop."""
+    from data.loader import BirdLoader
+    loader = BirdLoader()
+    available_dbs = sorted(set(ex.db_id for ex in loader.load()))
+
+    print("\n" + "=" * 60)
+    print("  TrustSQL — Interactive Demo")
+    print("=" * 60)
+    print(f"Available databases ({len(available_dbs)}):")
+    for i, db in enumerate(available_dbs, 1):
+        print(f"  {i:2}. {db}")
+    print("=" * 60)
+    print("Type 'quit' to exit.\n")
+
+    while True:
+        try:
+            question = input("Question: ").strip()
+            if question.lower() in ("quit", "exit", "q"):
+                print("Bye!")
+                break
+            if not question:
+                continue
+
+            db_id = input("Database ID: ").strip()
+            if db_id.lower() in ("quit", "exit", "q"):
+                print("Bye!")
+                break
+            if db_id not in available_dbs:
+                print(f"  [!] Unknown database '{db_id}'. Please choose from the list above.\n")
+                continue
+
+            evidence = input("Evidence (optional, press Enter to skip): ").strip()
+
+            print()
+            output = run_pipeline(question, db_id, llm, evidence=evidence, verbose=True)
+
+            result = output["result"]
+            print("=" * 60)
+            if result.success:
+                print(f"Final SQL:  {output['sql']}")
+                print(f"Result:     {result.rows}")
+            else:
+                print(f"Final SQL:  {output['sql']}")
+                print(f"Error:      {result.error}")
+            print("=" * 60 + "\n")
+
+        except KeyboardInterrupt:
+            print("\nBye!")
+            break
+
+
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Run TrustSQL pipeline on a query.")
-    parser.add_argument("--question", type=str, required=True, help="Natural language question")
-    parser.add_argument("--db_id", type=str, required=True, help="BIRD database ID")
+    parser.add_argument("--question", type=str, default=None, help="Natural language question")
+    parser.add_argument("--db_id", type=str, default=None, help="BIRD database ID")
     parser.add_argument("--model", type=str, default=OPENAI_MODEL, help="LLM model name")
     parser.add_argument("--verbose", action="store_true", help="Print intermediate steps")
     return parser.parse_args()
 
 
 def main() -> None:
-    """Main entry point: parse args, run pipeline, print result."""
+    """Main entry point: interactive mode if no args, single-query mode otherwise."""
     args = parse_args()
     llm = get_llm(args.model)
-    output = run_pipeline(args.question, args.db_id, llm, verbose=args.verbose)
-    print("SQL:", output["sql"])
-    result = output["result"]
-    if result.success:
-        print("Result:", result.rows)
+
+    if args.question is None or args.db_id is None:
+        # No arguments provided — enter interactive demo mode
+        interactive_mode(llm)
     else:
-        print("Execution Error:", result.error)
+        output = run_pipeline(args.question, args.db_id, llm, verbose=args.verbose)
+        print("SQL:", output["sql"])
+        result = output["result"]
+        if result.success:
+            print("Result:", result.rows)
+        else:
+            print("Execution Error:", result.error)
 
 
 if __name__ == "__main__":
