@@ -1,0 +1,192 @@
+{
+  "summary": {
+    "n": 20,
+    "ex_original": 0.4,
+    "ex_paraphrase": 0.3,
+    "ex_synonym": 0.3,
+    "drop_paraphrase": 0.1,
+    "drop_synonym": 0.1
+  },
+  "details": [
+    {
+      "question_id": 0,
+      "original_question": "What is the highest eligible free rate for K-12 students in the schools in Alameda County?",
+      "paraphrase": "What is the maximum qualifying free rate for K-12 students in schools located in Alameda County?",
+      "synonym": "What is the maximum qualifying complimentary rate for K-12 learners in the educational institutions within Alameda County?",
+      "original_correct": true,
+      "paraphrase_correct": true,
+      "synonym_correct": true
+    },
+    {
+      "question_id": 1,
+      "original_question": "Please list the lowest three eligible free rates for students aged 5-17 in continuation schools.",
+      "paraphrase": "Could you provide the three lowest qualifying free rates available for students aged 5-17 in continuation schools?",
+      "synonym": "Kindly provide the three least expensive qualifying free rates for learners aged 5-17 in continuation educational institutions.",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 2,
+      "original_question": "Please list the zip code of all the charter schools in Fresno County Office of Education.",
+      "paraphrase": "Could you provide the zip codes for all the charter schools under the Fresno County Office of Education?",
+      "synonym": "Kindly provide the postal codes for all the charter schools within the Fresno County Office of Education.",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 3,
+      "original_question": "What is the unabbreviated mailing street address of the school with the highest FRPM count for K-12 students?",
+      "paraphrase": "What is the full mailing street address of the school that has the highest number of FRPM students in K-12?",
+      "synonym": "What is the full mailing street address of the institution with the greatest FRPM total for K-12 learners?",
+      "original_correct": true,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 4,
+      "original_question": "Please list the phone numbers of the direct charter-funded schools that are opened after 2000/1/1.",
+      "paraphrase": "Could you provide the phone numbers for the direct charter-funded schools that began operating after January 1, 2000?",
+      "synonym": "Kindly provide the contact numbers of the direct charter-funded schools that commenced operations after January 1, 2000.",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 5,
+      "original_question": "How many schools with an average score in Math greater than 400 in the SAT test are exclusively virtual?",
+      "paraphrase": "What is the number of schools that have an average Math SAT score above 400 and operate solely online?",
+      "synonym": "What is the number of educational institutions with a mean score in Mathematics exceeding 400 on the SAT exam that are solely online?",
+      "original_correct": true,
+      "paraphrase_correct": true,
+      "synonym_correct": true
+    },
+    {
+      "question_id": 6,
+      "original_question": "Among the schools with the SAT test takers of over 500, please list the schools that are magnet schools or offer a magnet program.",
+      "paraphrase": "Please provide a list of schools that are either magnet schools or have a magnet program, specifically among those with more than 500 SAT test takers.",
+      "synonym": "Among the institutions with SAT participants exceeding 500, please identify the schools that are magnet institutions or provide a magnet program.",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 7,
+      "original_question": "What is the phone number of the school that has the highest number of test takers with an SAT score of over 1500?",
+      "paraphrase": "What is the contact number for the school that has the largest number of students who scored over 1500 on the SAT?",
+      "synonym": "What is the contact number for the institution that has the largest amount of exam participants with an SAT score exceeding 1500?",
+      "original_correct": true,
+      "paraphrase_correct": false,
+      "synonym_correct": true
+    },
+    {
+      "question_id": 8,
+      "original_question": "What is the number of SAT test takers of the schools with the highest FRPM count for K-12 students?",
+      "paraphrase": "How many students took the SAT in the schools that have the highest count of free or reduced-price meal (FRPM) participants for K-12?",
+      "synonym": "What is the quantity of SAT examinees from the institutions with the largest FRPM total for K-12 learners?",
+      "original_correct": true,
+      "paraphrase_correct": true,
+      "synonym_correct": true
+    },
+    {
+      "question_id": 9,
+      "original_question": "Among the schools with the average score in Math over 560 in the SAT test, how many schools are directly charter-funded?",
+      "paraphrase": "How many schools that have an average SAT Math score above 560 are funded directly by charter?",
+      "synonym": "Among the institutions with an average Math score exceeding 560 on the SAT exam, how many are directly funded by charter?",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 10,
+      "original_question": "For the school with the highest average score in Reading in the SAT test, what is its FRPM count for students aged 5-17?",
+      "paraphrase": "What is the FRPM count for students aged 5-17 at the school that has the highest average Reading score on the SAT?",
+      "synonym": "For the institution with the greatest mean score in Reading on the SAT examination, what is its count of FRPM students aged 5-17?",
+      "original_correct": false,
+      "paraphrase_correct": true,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 11,
+      "original_question": "Please list the codes of the schools with a total enrollment of over 500.",
+      "paraphrase": "Could you provide the codes for the schools that have an enrollment exceeding 500 students?",
+      "synonym": "Kindly provide the identifiers of the institutions that have an overall enrollment exceeding 500 students.",
+      "original_correct": true,
+      "paraphrase_correct": true,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 12,
+      "original_question": "Among the schools with an SAT excellence rate of over 0.3, what is the highest eligible free rate for students aged 5-17?",
+      "paraphrase": "Which school has the highest qualifying free rate for students aged 5-17 among those with an SAT excellence rate exceeding 0.3?",
+      "synonym": "Among the institutions with an SAT success rate exceeding 0.3, what is the highest qualifying free rate for learners aged 5-17?",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 13,
+      "original_question": "Please list the phone numbers of the schools with the top 3 SAT excellence rate.",
+      "paraphrase": "Could you provide the contact numbers for the schools that have the highest SAT excellence rates?",
+      "synonym": "Kindly provide the contact numbers of the institutions that have the highest 3 SAT achievement rates.",
+      "original_correct": true,
+      "paraphrase_correct": false,
+      "synonym_correct": true
+    },
+    {
+      "question_id": 14,
+      "original_question": "List the top five schools, by descending order, from the highest to the lowest, the most number of Enrollment (Ages 5-17). Please give their NCES school identification number.",
+      "paraphrase": "Please provide a list of the five schools with the highest enrollment numbers for ages 5-17, arranged from highest to lowest, along with their NCES school identification numbers.",
+      "synonym": "Enumerate the five leading institutions, arranged in decreasing order from the greatest to the least, based on the highest number of enrollments (Ages 5-17). Kindly provide their NCES school identification numbers.",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 15,
+      "original_question": "Which active district has the highest average score in Reading?",
+      "paraphrase": "Which active district boasts the highest average score in Reading?",
+      "synonym": "Which engaged district possesses the highest mean score in Reading?",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 16,
+      "original_question": "How many schools in merged Alameda have number of test takers less than 100?",
+      "paraphrase": "What is the count of schools in merged Alameda that have fewer than 100 test takers?",
+      "synonym": "What is the count of educational institutions in consolidated Alameda that have fewer than 100 exam participants?",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 17,
+      "original_question": "Rank schools by their average score in Writing where the score is greater than 499, showing their charter numbers.",
+      "paraphrase": "List the schools according to their average Writing scores above 499, including their charter numbers.",
+      "synonym": "Order educational institutions based on their mean score in Writing, provided the score exceeds 499, and display their charter identifiers.",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 18,
+      "original_question": "How many schools in Fresno (directly funded) have number of test takers not more than 250?",
+      "paraphrase": "What is the number of directly funded schools in Fresno that have 250 or fewer test takers?",
+      "synonym": "What is the count of educational institutions in Fresno (publicly financed) that have a number of exam participants not exceeding 250?",
+      "original_correct": false,
+      "paraphrase_correct": false,
+      "synonym_correct": false
+    },
+    {
+      "question_id": 19,
+      "original_question": "What is the phone number of the school that has the highest average score in Math?",
+      "paraphrase": "What is the contact number for the school with the highest average Math score?",
+      "synonym": "What is the contact number for the institution that possesses the highest mean score in Mathematics?",
+      "original_correct": true,
+      "paraphrase_correct": true,
+      "synonym_correct": true
+    }
+  ]
+}

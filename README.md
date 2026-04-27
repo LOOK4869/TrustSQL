@@ -371,3 +371,23 @@ python experiments/run_llm_comparison.py
 | `gpt-4o-mini` | OpenAI | 性价比高，推理能力强 |
 | `gemini-1.5-flash` | Google | 推理速度快，支持多模态 |
 | `llama3-8b-8192` | Meta via Groq | 开源权重，通过 Groq API 快速推理 |
+
+
+
+**问题1**
+- Question: `What is the phone number of the school that has the highest average score in Math?`
+- Evidence: 
+- Database: `california_schools`
+- 预期结果: `(408) 366-7700`
+
+**问题2**
+- Question: `What is the type of education offered in the school who scored the highest average in Math?`
+- Evidence: 
+- Database: `california_schools`
+- 预期结果: `Traditional`
+
+**问题3**
+- Question: `How many schools with an average score in Math greater than 400 in the SAT test are exclusively virtual?`
+- Evidence: `Exclusively virtual refers to Virtual = 'F'`
+- Database: `california_schools`
+- 预期结果: `4`

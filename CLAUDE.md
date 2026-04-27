@@ -207,13 +207,42 @@ trustsql/
 
 ## 待完成事项
 
-### Milestone 5 补充（待实现，最后统一跑）
-- Robustness 测试：paraphrase + synonym replace 两种扰动，结果放进 Notebook
-- Efficiency & Cost：在实验脚本加计时，记录 baseline vs full pipeline 平均延迟
+### Milestone 5 补充 ✅
+- Robustness 测试 ✅：paraphrase + synonym replace 两种扰动，结果放进 Notebook
+- Efficiency & Cost ✅：Notebook 中直接计时，baseline vs full pipeline 平均延迟
 
-### Milestone 6: Results and Final Report（待做）
-- 制作 Notebook：实验数据图表（对比表、错误类型分布、难度分组）
-- 写最终报告
+#### 鲁棒性测试结果（n=20，GPT-4o-mini，Full Pipeline）
+| 扰动方式 | EX | 下降 |
+|---------|-----|------|
+| Original | 40% | — |
+| Paraphrase | 30% | -10% |
+| Synonym Replace | 30% | -10% |
+
+分析：两种扰动均导致准确率下降 10%，说明系统对问题措辞有一定敏感性。
+根本原因：Schema Filtering 依赖问题中的关键词匹配，措辞变化可能导致相关列被过滤掉。
+报告写法：作为 Limitations 如实呈现，Future Work 提出 paraphrase augmentation 和更鲁棒的 schema linking 作为改进方向。
+
+### Milestone 6: Final Report（待做）
+
+#### 报告格式要求
+- 约 8 页，不含参考文献和附录
+- 第一页：标题、全名、UNI（kl3753）
+- 字体：11pt，单倍行距，1 inch 页边距
+- 需要页码
+- 需要参考文献（BIRD benchmark、GPT-4o-mini、Llama 3.1、相关 Text-to-SQL 论文）
+- 附录放大图、截图、代码示例
+- 需要提供 GitHub 仓库链接
+
+#### 报告必须包含的四个部分
+1. **Synopsis** — 项目概述，说明做了什么、怎么做的、创新点和价值
+2. **Research Questions** — 研究问题及答案，必须包含消融实验
+3. **Deliverables** — GitHub 仓库链接，包含所有代码、实验脚本、文档
+4. **Self-Evaluation** — 完成了什么、遇到什么挑战、学到了什么
+
+#### 注意事项
+- 如果之前进度报告承诺了但没做到的内容，必须说明原因（如 Gemini API 政策变更）
+- 老师特别喜欢图表、流程图、对比图，多放视觉内容
+- 需要说明是否有人在课外合作（disclosure）
 
 ### Milestone 7: Demo 准备
 - 改造 main.py 为交互式模式 ✅（直接运行无需参数，显示数据库列表，循环输入）
@@ -224,13 +253,13 @@ trustsql/
 
 **问题1（推荐首选，结果直观）**
 - Question: `What is the phone number of the school that has the highest average score in Math?`
-- Evidence: （留空，直接回车）
+- Evidence: 
 - Database: `california_schools`
 - 预期结果: `(408) 366-7700`
 
 **问题2（有趣，涉及计算）**
 - Question: `What is the type of education offered in the school who scored the highest average in Math?`
-- Evidence: （留空）
+- Evidence: 
 - Database: `california_schools`
 - 预期结果: `Traditional`
 
@@ -240,9 +269,4 @@ trustsql/
 - Database: `california_schools`
 - 预期结果: `4`
 
-**Demo 现场流程（共6分钟）：**
-1. 1分钟：PPT 介绍项目（是什么、三个机制）
-2. 3分钟：现场跑 main.py（交互式，2-3条问题）
-3. 2分钟：切换到 Notebook 展示实验数据和图表
 
-**提交内容：** PPT + Notebook 链接
