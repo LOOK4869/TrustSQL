@@ -100,7 +100,17 @@ Expected: `Loaded 1534 examples`
 python main.py
 ```
 
-Displays a list of available databases, then prompts for a natural language question. Runs the full 5-step pipeline and prints intermediate results.
+Displays a list of available databases. Enter a database name, then type a natural language question. The pipeline runs all 5 steps and prints intermediate results (filtered schema, CoT reasoning, generated SQL, verification, execution result).
+
+**Example queries to try (all verified correct):**
+
+| # | Question | Database | Evidence | Expected Result |
+|---|----------|----------|----------|-----------------|
+| 1 | `What is the phone number of the school that has the highest average score in Math?` | `california_schools` | _(leave blank)_ | `(408) 366-7700` |
+| 2 | `What is the type of education offered in the school who scored the highest average in Math?` | `california_schools` | _(leave blank)_ | `Traditional` |
+| 3 | `How many schools with an average score in Math greater than 400 in the SAT test are exclusively virtual?` | `california_schools` | `Exclusively virtual refers to Virtual = 'F'` | `4` |
+
+Query 3 demonstrates the domain knowledge (Evidence) feature — paste the evidence string when prompted.
 
 ### Single query (non-interactive)
 

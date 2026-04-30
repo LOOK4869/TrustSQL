@@ -1,17 +1,17 @@
-# TrustSQL Python 依赖 / Python Dependencies
+# TrustSQL Python Dependencies
 
-# LLM APIs / 大语言模型接口
+# LLM APIs
 openai>=1.30.0              # GPT-4o-mini
-google-generativeai>=0.7.0  # Gemini 1.5 Flash
-groq>=0.9.0                 # Llama 3 via Groq
+google-generativeai>=0.7.0  # Gemini 2.0 Flash
+groq>=0.9.0                 # Llama 3.1 via Groq
 
-# Database / 数据库操作
-sqlalchemy>=2.0.0           # SQL execution abstraction / SQL 执行抽象层
-# sqlite3 is part of Python stdlib / sqlite3 为 Python 标准库，无需安装
+# Database
+sqlalchemy>=2.0.0           # SQL execution abstraction
+# sqlite3 is part of Python stdlib, no installation needed
 
-# Data processing / 数据处理
-pandas>=2.0.0               # Result comparison and analysis / 结果比对与分析
-tqdm>=4.66.0                # Progress bars / 进度条
+# Data processing
+pandas>=2.0.0               # Result comparison and analysis
+tqdm>=4.66.0                # Progress bars
 
-# Config / 配置管理
-python-dotenv>=1.0.0        # Load API keys from .env / 从 .env 加载 API 密钥
+# Config
+python-dotenv>=1.0.0        # Load API keys from .env
