@@ -79,7 +79,7 @@ def run_config(
 
 def main():
     loader = BirdLoader()
-    examples = loader.load()[:20]  # 只用前20条
+    examples = loader.load()[:20]
     llm = OpenAILLM()
 
     configs = [
